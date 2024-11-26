@@ -1,30 +1,46 @@
+#include <memory>
+#include <string>
 #include <utility>
 
-#include <trie.hpp>
-#define cn_coll_ns(a) cnn_practice::collections::a
 
-cn_coll_ns(CharStringTrie)(){
-    this -> root = new TrieNode();
+#include <collections.hpp>
+#include <trie.hpp>
+#include <__trie.hpp>
+
+CN_COLL_NS(CharStringTrie::CharStringTrie)(){
+    this -> root = std::shared_ptr<
+        cnn_practice::collections::CharStringTrie::TrieNode
+    >(new TrieNode());
     this -> root -> value = '\0';
 }
 
-cn_coll_ns(CharStringTrie)(std::string input) : CharStringTrie(){
+CN_COLL_NS(CharStringTrie::CharStringTrie)(std::string input) : CharStringTrie(){
    this -> add(input);
 }
 
-cn_coll_ns(CharStringTrie)(cn_coll_ns(CharStringTrie&&) old){
-    this -> root = std::move(old -> root);
+CN_COLL_NS(CharStringTrie::CharStringTrie)(CN_COLL_NS(CharStringTrie&&) old){
+    this -> root = std::move(old.root);
 }
 
-void cn_coll_ns(CharStringTrie::insert)(
-    const std::string& input
-    const std::string::iterator& input_start,
-    std::shared_ptr<TrieNode*> node_start    
+void CHAR_TRIE_MEMBER(insert)(
+    const std::string& input,
+    std::string::const_iterator input_start,
+    std::shared_ptr<TrieNode> node_start    
 ){
-   //Write insertion logic here. 
+   //Write insertion logic here.
+   std::shared_ptr<TrieNode> curr_node, ptr_temp;
+   curr_node = node_start;
+
+   for(; input_start != input.end(); input_start++){
+       ptr_temp = std::shared_ptr<TrieNode>(new TrieNode());
+       ptr_temp -> value = *input_start;
+       curr_node -> children.push_back(ptr_temp);
+       curr_node = ptr_temp;
+   }
+   curr_node -> is_leaf = true;
 }
 
-void cn_coll_ns(CharStringTrie::add)(const std::string& input){
+void CHAR_TRIE_MEMBER(add)(const std::string& input){
     bool found = false;
     bool insert = true;
     //bool break_outer = false;
@@ -32,11 +48,12 @@ void cn_coll_ns(CharStringTrie::add)(const std::string& input){
         return;
     }
 
-    std::shared_ptr<TrieNode*> curr_node = this -> root;
-    std::shared_ptr<TrieNode*> insert_node_start;
-    std::string::iterator iter = input.begin();
+    std::shared_ptr<TrieNode> curr_node = this -> root;
+    std::shared_ptr<TrieNode> insert_node_start;
+    std::string::const_iterator iter = input.begin();
+    std::string::const_iterator input_end = input.end();
 
-    for(; iter != input.end(); iter++){
+    for(; iter != input_end; iter++){
 
         for(auto ptr : curr_node -> children){
             if (ptr -> value == *iter){
@@ -49,28 +66,45 @@ void cn_coll_ns(CharStringTrie::add)(const std::string& input){
         if(!found){
             insert = true;
             insert_node_start = curr_node;
-            insert_iter_start = iter;
             break;
         }
 
         //Ok. What happens if the string does
         //exist in the trie, but as a substring
         //of a larger string?
-        if ((iter + 1) == input.end()){
-            if(!curr_node.is_leaf){
+        if ((iter + 1) == input_end){
+            if(!curr_node -> is_leaf){
                 insert = true;
                 insert_node_start = this -> root;
-                insert_iter_start = input.begin();
+                iter = input.begin();
             }
         }
         found = false;
     } //end outer for.
 
     if (insert){
-        this -> insert(&input, &iter, insert_node_start);
+        this -> insert(input, iter, insert_node_start);
     }
  }
 
- bool cn_coll_ns(CharStringTrie::contains)(){
+ bool CHAR_TRIE_MEMBER(contains)(
+    const std::string& input
+ ){
+    bool found = false;
+    //Hello:
+    std::shared_ptr<TrieNode> curr_node = this -> root;
+    for(auto iter = input.begin(); iter != input.end(); iter++){
+        for(auto node : curr_node -> children){
+            if(node -> value == *iter){
+                found = true;
+                curr_node = node;
+            }
+        }
+        if(!found){
+            return false;
+        }
+    }
 
+    //Remember. We don't care about substrings. 
+    return curr_node -> is_leaf;
  }

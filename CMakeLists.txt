@@ -7,7 +7,10 @@ set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 add_executable(test_runner ${PROJECT_SOURCE_DIR}/main.cpp)
 
 add_library(trie STATIC ${PROJECT_SOURCE_DIR}/trie.cpp)
-target_include_directories(trie PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include)
+target_include_directories(trie 
+    PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_LIST_DIR}/internal/include    
+)
 
 add_executable(opencv_load_jpeg_test ${PROJECT_SOURCE_DIR}/opencv_jpeg.cpp)
 target_include_directories(opencv_load_jpeg_test  PRIVATE ${OpenCV_INCLUDE_DIRS})
