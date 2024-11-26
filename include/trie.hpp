@@ -30,6 +30,7 @@ class CharStringTrie {
 
     //Properties:
     private:
+    int edge_count;
     std::shared_ptr<TrieNode> root;
 
     //Methods:
@@ -44,10 +45,26 @@ class CharStringTrie {
     CharStringTrie();
     CharStringTrie(const std::string input);
     CharStringTrie(CharStringTrie&& old);
+    int get_edge_count();
 
     void add(const std::string& new_input);
     bool contains(const std::string& str_to_check);
+    bool starts_with_value_in_trie(
+        std::string::const_iterator begin,
+        std::string::const_iterator end
+    );
 
+    bool starts_with_value_in_trie(
+        std::string::reverse_iterator begin,
+        std::string::reverse_iterator end
+    );
+
+    bool starts_with_value_in_trie(
+        std::string::iterator begin,
+        std::string::iterator end
+    );
+
+    std::vector<std::string> dump_entries();
 };
 
     };

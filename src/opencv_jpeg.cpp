@@ -1,70 +1,58 @@
+#include <algorithm>
+#include <cctype>
 #include <filesystem>
 #include <iostream>
 #include <memory>
 #include <string>
 #include <vector>
 
+
+#include <trie.hpp>
 namespace fs = std::filesystem;
 
+//Constants:
 const std::string proj_dir_name = "jpeg-endianness-tests";
 const std::string image_dir_name = "test_images";
 
-typedef struct TrieNode {
-    const char value;
-    int num_children;
-} TrieNode;
 
-//Not trying to be clever.
-//This is just the most straightforward
-//way for me to check file types without using
-//regexes.
-const int jpeg_ft_trie_size = 5;
-const TrieNode jpeg_file_type_trie[jpeg_ft_trie_size] = {
-    TrieNode{'\0', 2},
-    TrieNode{'g', 1},
-    TrieNode{'G', 2}
-    TrieNode{'p', 2},
-    TrieNode{'j', 0},
-    TrieNode{'e', 1},
-    TrieNode{'j', 0}
-};
+//Type definitions:
+typedef struct Config{
+    cnn_practice::collections::CharStringTrie filetype_trie;
+} Config;
 
-bool is_jpeg_file(const fs::path& file){
-    std::vector<int> trie_index_stack;
-    std::string temp;
-    TrieNode node_temp;
-    fs::file_status f_status = fs::status(file);
-    if(f_status.type() != fs::file_type::regular){
-        return false;
-    }
-
-    //Is JPEG?
-    temp = file.string();
-    std::string::reverse_iterator riter = temp.rbegin();
-
-    //Walk the trie:
-    for(int i = 0; i < jpeg_ft_trie_size;){
-        node_temp = jpeg_file_type_trie[i];
-        if (*riter == *(node_temp.value)){
-           i = i + (node_temp.num_children - 1); 
-           riter++;
-        } else if (trie_index_stack.size() > 0) { 
-            //Skip to next child:
-        } else {
-           return false;
-        }
-    }
-
-    return true;
+std::string convert_to_lowercase(std::string input){
+    std::transform(input.begin(), input.end(), input.begin(),
+    [](unsigned char c){ return std::tolower(c); });
+    
+    return input;
 }
 
+std::shared_ptr<Config> get_config(){
+    std::shared_ptr<Config> retval(new Config);
+    //Makes searching trivial:
+    retval -> filetype_trie.add(".gepj");
+    retval -> filetype_trie.add(".gpj");
+    return retval;
+}
+
+
+bool is_jpeg_file(const std::shared_ptr<Config> config, const fs::path& file){
+    std::string filename = convert_to_lowercase(file.filename());
+    return config -> filetype_trie.starts_with_value_in_trie(filename.rbegin(), filename.rend());
+}
+
+//This isn't working correctly.
+//It fails when the CWD is already the project root.
 std::shared_ptr<fs::path> get_project_dirtree_path(){
-    fs::path prev_path = fs::current_path();
-    fs::path path_check = prev_path.parent_path();
+    //fs::path prev_path = fs::current_path();
+    //fs::path path_check = prev_path.parent_path();
+    fs::path path_check = fs::current_path();
+
     bool found = false;
-    while ( path_check != prev_path && !found ){
+    //When we are at the root_dir, current path and parent path
+    //are the same.
+    while (path_check != path_check.parent_path() && !found ){
 	    if (path_check.filename() != proj_dir_name){
-            prev_path = path_check;
 	        path_check = path_check.parent_path();
 	        continue;
 	    }
@@ -93,15 +81,18 @@ std::shared_ptr<fs::path> get_image_directory_path(
 }
 
 std::vector<std::string> get_jpeg_image_paths(
+    std::shared_ptr<Config> config,
     std::shared_ptr<fs::path> image_path
 ){
-    std::string str_temp;
+    fs::path p_temp;
     std::vector<std::string> retval;
-    for(const fs::directory_entry dir_ent : 
-        fs::recursive_directory_iterator(image_path -> string())){   
-        str_temp = dir_ent.path().string();
-        if(str_temp ){
-
+    for(
+        const fs::directory_entry dir_ent : 
+        fs::recursive_directory_iterator(image_path -> string())
+    ){   
+        p_temp = dir_ent.path();
+        if(is_jpeg_file(config, p_temp)){
+            retval.push_back(p_temp.filename());
         }
     };
 
@@ -109,17 +100,31 @@ std::vector<std::string> get_jpeg_image_paths(
 }
 
 int main (){
+    std::shared_ptr<Config> config = get_config(); 
     std::shared_ptr<fs::path> proj_path = get_project_dirtree_path();
     if (proj_path == nullptr){
         std::cerr << "This program needs to be run from within the \"jpeg-endianness-tests\" directory.\n";
+        return 1;
     }
 
     
     std::shared_ptr<fs::path> image_path = get_image_directory_path(proj_path);
+
     if(image_path == nullptr){
         std::cerr << "The \"test_images\" directory does not exist.\n";
+        return 1;
     }
 
     std::cout << image_path -> string() << "\n";
+
+    std::vector<std::string> images = get_jpeg_image_paths(config, image_path);
+    
+    std::cout << "******************************************\n";
+    
+    for(auto elem : images){
+        std::cout << elem << "\n";
+    }
+
+    std::cout << "\n";
     return 0;
 }

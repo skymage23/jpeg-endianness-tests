@@ -8,6 +8,7 @@
 #include <__trie.hpp>
 
 CN_COLL_NS(CharStringTrie::CharStringTrie)(){
+    this -> edge_count = 0;
     this -> root = std::shared_ptr<
         cnn_practice::collections::CharStringTrie::TrieNode
     >(new TrieNode());
@@ -22,6 +23,10 @@ CN_COLL_NS(CharStringTrie::CharStringTrie)(CN_COLL_NS(CharStringTrie&&) old){
     this -> root = std::move(old.root);
 }
 
+int CHAR_TRIE_MEMBER(get_edge_count)(){
+    return this -> edge_count;
+}
+
 void CHAR_TRIE_MEMBER(insert)(
     const std::string& input,
     std::string::const_iterator input_start,
@@ -32,9 +37,10 @@ void CHAR_TRIE_MEMBER(insert)(
    curr_node = node_start;
 
    for(; input_start != input.end(); input_start++){
-       ptr_temp = std::shared_ptr<TrieNode>(new TrieNode());
+       ptr_temp = std::shared_ptr<TrieNode>(new TrieNode);
        ptr_temp -> value = *input_start;
        curr_node -> children.push_back(ptr_temp);
+       this -> edge_count = this -> edge_count + 1;
        curr_node = ptr_temp;
    }
    curr_node -> is_leaf = true;
@@ -90,12 +96,19 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
  bool CHAR_TRIE_MEMBER(contains)(
     const std::string& input
  ){
+    return this -> starts_with_value_in_trie(input.begin(), input.end()); 
+ }
+
+ bool CHAR_TRIE_MEMBER(starts_with_value_in_trie)(
+    std::string::const_iterator begin,
+    std::string::const_iterator end
+ ) {
     bool found = false;
     //Hello:
     std::shared_ptr<TrieNode> curr_node = this -> root;
-    for(auto iter = input.begin(); iter != input.end(); iter++){
+    for(; begin != end; begin++){
         for(auto node : curr_node -> children){
-            if(node -> value == *iter){
+            if(node -> value == *begin){
                 found = true;
                 curr_node = node;
             }
@@ -107,4 +120,65 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
 
     //Remember. We don't care about substrings. 
     return curr_node -> is_leaf;
+ }
+
+
+ bool CHAR_TRIE_MEMBER(starts_with_value_in_trie)(
+    std::string::reverse_iterator begin,
+    std::string::reverse_iterator end
+ ) {
+    bool found = false;
+    //Hello:
+    std::shared_ptr<TrieNode> curr_node = this -> root;
+    for(; begin != end; begin++){
+        for(auto node : curr_node -> children){
+            if(node -> value == *begin){
+                found = true;
+                curr_node = node;
+            }
+        }
+        if(!found){
+            return false;
+        }
+    }
+
+    //Remember. We don't care about substrings. 
+    return curr_node -> is_leaf;
+ }
+
+
+ bool CHAR_TRIE_MEMBER(starts_with_value_in_trie)(
+    std::string::iterator begin,
+    std::string::iterator end
+ ) {
+    bool found = false;
+    //Hello:
+    std::shared_ptr<TrieNode> curr_node = this -> root;
+    for(; begin != end; begin++){
+        for(auto node : curr_node -> children){
+            if(node -> value == *begin){
+                found = true;
+                curr_node = node;
+            }
+        }
+        if(!found){
+            return false;
+        }
+    }
+
+    //Remember. We don't care about substrings. 
+    return curr_node -> is_leaf;
+ }
+
+ std::vector<std::string> CHAR_TRIE_MEMBER(dump_entries)(){
+    //Hello.
+    std::vector<std::string> retval;
+    std::vector<std::shared_ptr<TrieNode>> node_stack;
+
+    //Depth first: 
+    node_stack.push_back(this -> root);
+    while(node_stack.size() > 0){
+        while
+    }
+
  }

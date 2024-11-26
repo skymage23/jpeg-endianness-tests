@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 project(jpeg-endianness-tests  CXX)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 
 find_package(OpenCV REQUIRED)
 message(STATUS ${OpenCV_INCLUDE_DIRS})
@@ -18,3 +20,4 @@ target_link_libraries(opencv_load_jpeg_test
     trie
 )
 
+add_subdirectory(tests)
