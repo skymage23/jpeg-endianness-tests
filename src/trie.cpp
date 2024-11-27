@@ -1,6 +1,9 @@
 #include <memory>
+#include <stack>
+#include <stdlib.h>
 #include <string>
 #include <utility>
+#include <vector>
 
 
 #include <collections.hpp>
@@ -170,15 +173,57 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
     return curr_node -> is_leaf;
  }
 
+
  std::vector<std::string> CHAR_TRIE_MEMBER(dump_entries)(){
-    //Hello.
+    //Data structures:
+    typedef struct StackNode {
+        unsigned long curr_child_ind = 0;
+        std::shared_ptr<TrieNode> trie_node;
+        
+    } StackNode;
+
+     //Hello.
     std::vector<std::string> retval;
-    std::vector<std::shared_ptr<TrieNode>> node_stack;
+    std::vector<std::shared_ptr<StackNode>> node_stack;;
+    std::shared_ptr<StackNode> stack_elem;
+
+    //Gets allocated when are ready to walk the stack back.
+    char* char_arr_temp = NULL;
+    size_t char_stack_size = 0;
 
     //Depth first: 
-    node_stack.push_back(this -> root);
-    while(node_stack.size() > 0){
-        while
-    }
+    node_stack.push_back(std::shared_ptr<StackNode>(new StackNode{0, this -> root}));
 
+    while(!node_stack.empty()){
+        stack_elem = node_stack[node_stack.size() - 1];
+        if(stack_elem -> trie_node -> is_leaf){
+            //Add complete string to retval.
+            //Now that we have found the leaf node,
+            //pop from the stack until it is empty.
+            //Then, if the, at the time, value of node_temp
+            //has another child, place said child on the stack.
+            char_stack_size = node_stack.size();
+            char_arr_temp = new char[char_stack_size];
+            for (unsigned long i = char_stack_size - 1; i != 0; i--){
+                 char_arr_temp[i] = node_stack[i] -> trie_node -> value;
+            }
+            retval.push_back(std::string(char_arr_temp));
+            delete[] char_arr_temp;
+        }
+
+        if(stack_elem -> curr_child_ind < stack_elem -> trie_node -> children.size()){
+            node_stack.push_back(
+                std::shared_ptr<StackNode>(
+                    new StackNode{
+                        0,
+                        stack_elem -> trie_node -> children[stack_elem -> curr_child_ind]
+                    }
+                )
+            );
+            stack_elem -> curr_child_ind += 1;
+        } else {
+            node_stack.pop_back();
+        }
+    }
+    return retval;
  }

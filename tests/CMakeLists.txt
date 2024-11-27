@@ -33,6 +33,17 @@ target_include_directories(unit_tests PUBLIC
     get_filename_component(REALPATH ${CMAKE_CURRENT_LIST_DIR}/../include)
 )
 
+#if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+#    target_compile_options(unit_tests
+#        PRIVATE -O0   #May want to move this outside CMake.
+#        PRIVATE -g
+#        PRIVATE -fsanitize=address
+#        PRIVATE -fsanitize=leak
+#        PRIVATE -Lasan
+#    )
+#endif()
+
+
 
 target_link_libraries( unit_tests
     trie
