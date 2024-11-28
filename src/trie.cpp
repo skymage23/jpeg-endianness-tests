@@ -12,10 +12,17 @@
 
 CN_COLL_NS(CharStringTrie::CharStringTrie)(){
     this -> edge_count = 0;
+    this -> root_children = std::shared_ptr<
+        std::vector<std::shared_ptr<TrieNode>>
+    >(
+        new std::vector<std::shared_ptr<TrieNode>>()
+    );
+    /*
     this -> root = std::shared_ptr<
         cnn_practice::collections::CharStringTrie::TrieNode
     >(new TrieNode());
     this -> root -> value = '\0';
+    */
 }
 
 CN_COLL_NS(CharStringTrie::CharStringTrie)(std::string input) : CharStringTrie(){
@@ -23,7 +30,7 @@ CN_COLL_NS(CharStringTrie::CharStringTrie)(std::string input) : CharStringTrie()
 }
 
 CN_COLL_NS(CharStringTrie::CharStringTrie)(CN_COLL_NS(CharStringTrie&&) old){
-    this -> root = std::move(old.root);
+    this -> root_children = std::move(old.root_children);
 }
 
 int CHAR_TRIE_MEMBER(get_edge_count)(){
@@ -42,7 +49,8 @@ void CHAR_TRIE_MEMBER(insert)(
    for(; input_start != input.end(); input_start++){
        ptr_temp = std::shared_ptr<TrieNode>(new TrieNode);
        ptr_temp -> value = *input_start;
-       curr_node -> children.push_back(ptr_temp);
+       ptr_temp -> is_leaf = false;
+       curr_node -> children -> push_back(ptr_temp);
        this -> edge_count = this -> edge_count + 1;
        curr_node = ptr_temp;
    }
@@ -57,24 +65,33 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
         return;
     }
 
-    std::shared_ptr<TrieNode> curr_node = this -> root;
-    std::shared_ptr<TrieNode> insert_node_start;
+    //std::shared_ptr<TrieNode> curr_node = this -> root;
+    std::shared_ptr<
+        std::vector<std::shared_ptr<TrieNode>>
+    > children_vector = this -> root_children;
+    std::shared_ptr<TrieNode> insert_node_start = nullptr;
     std::string::const_iterator iter = input.begin();
     std::string::const_iterator input_end = input.end();
 
     for(; iter != input_end; iter++){
 
-        for(auto ptr : curr_node -> children){
+        for(auto ptr : *children_vector){
             if (ptr -> value == *iter){
                 found = true;
-                curr_node = ptr;
+                insert_node_start = ptr;
+                children_vector = ptr -> children;
                 break;
             }
         }
 
+        //You are here.
+        //You are in the process of moving from
+        //traversing the trie using a root node
+        //to having the trie object itself be the
+        //root and iterating over its children
+        //during traversal.
         if(!found){
             insert = true;
-            insert_node_start = curr_node;
             break;
         }
 
@@ -204,9 +221,10 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
             //has another child, place said child on the stack.
             char_stack_size = node_stack.size();
             char_arr_temp = new char[char_stack_size];
-            for (unsigned long i = char_stack_size - 1; i != 0; i--){
+            for (unsigned long i = char_stack_size - 1; i > 0; i--){
                  char_arr_temp[i] = node_stack[i] -> trie_node -> value;
             }
+            char_arr_temp[0] = node_stack[0] -> trie_node -> value;
             retval.push_back(std::string(char_arr_temp));
             delete[] char_arr_temp;
         }

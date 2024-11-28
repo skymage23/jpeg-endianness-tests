@@ -22,7 +22,7 @@ class CharStringTrie {
     struct TrieNode {
         char value;
         bool is_leaf;
-        std::vector<std::shared_ptr<TrieNode>> children;
+        std::shared_ptr<std::vector<std::shared_ptr<TrieNode>>> children;
     };
 
 //    public:
@@ -31,7 +31,12 @@ class CharStringTrie {
     //Properties:
     private:
     int edge_count;
-    std::shared_ptr<TrieNode> root;
+    //std::shared_ptr<TrieNode> root;
+    std::shared_ptr<
+        std::vector<
+            std::shared_ptr<TrieNode>
+        >
+    > root_children;
 
     //Methods:
     private:
