@@ -7,22 +7,31 @@
 #include <unordered_map>
 #include <vector>
 
-#include <collections.hpp>
+
+#include <tree.hpp>
 
 //Type definitions:
 namespace cnn_practice {
     namespace collections {
 
-//Need some way to denote leaf nodes.
-//
-class CharStringTrie {
+
+
+class CharStringTrie : RootTreeNode {
 
     //Nested Classes:
     private:
-    struct TrieNode {
-        char value;
+     class TrieNode : DataStoreTreeNode<char>{
+        private:
         bool is_leaf;
-        std::shared_ptr<std::vector<std::shared_ptr<TrieNode>>> children;
+
+        TrieNode(
+            char value,
+            std::shared_ptr<TreeNode> parent,
+            bool is_leaf
+        ) : DataStoreTreeNode(value, parent){
+            this -> is_leaf = is_leaf;
+        }
+
     };
 
 //    public:

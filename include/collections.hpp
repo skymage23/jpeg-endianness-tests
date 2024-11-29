@@ -2,7 +2,9 @@
 #define CNN_PRACTICE_COLLECTIONS
 
 //includes:
+#include <tree.hpp>
 #include <trie.hpp>
+
 
 //Preprocessor macros:
 #define CN_COLL_NS(a) cnn_practice::collections::a

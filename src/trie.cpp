@@ -74,7 +74,6 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
     std::string::const_iterator input_end = input.end();
 
     for(; iter != input_end; iter++){
-
         for(auto ptr : *children_vector){
             if (ptr -> value == *iter){
                 found = true;
