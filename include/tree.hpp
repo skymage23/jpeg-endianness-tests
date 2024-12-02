@@ -2,48 +2,65 @@
 #include <vector>
 
 
+#include <error_handling/exceptions.hpp>
+#include <collections.hpp>
+
 #ifndef CNN_PRACTICE_TREE
 #define CNN_PRACTICE_TREE
 
+
 namespace cnn_practice {
     namespace collections {
+
         class TreeNode {
             private:
-            bool is_root;
-            bool is_leaf;
+            bool root;
+            bool leaf;
 
             protected:
             std::shared_ptr<TreeNode> parent;
             std::shared_ptr<std::vector<TreeNode>> children;
 
-
-            protected:
-            TreeNode(bool is_root, bool is_leaf, std::shared_ptr<TreeNode> parent){
+            //protected:
+            public:
+            TreeNode(bool root, bool leaf, std::shared_ptr<TreeNode> parent){
                 this -> parent = parent;
-                this -> is_root = is_root;
-                this -> is_leaf = is_leaf;
+                this -> root = root;
+                this -> leaf = leaf;
             }
 
+            
+            bool is_root(){ return this -> root; }
+            bool is_leaf(){ return this -> leaf; }
+
+            public:
             TreeNode(TreeNode&& input){
                 this -> parent = input.parent;
                 this -> children = input.children;
-                this -> is_root = input.is_root;
-                this -> is_leaf = input.is_leaf;
+                this -> root = input.root;
+                this -> leaf = input.leaf;
             }
 
-            bool is_root(){ return this -> is_root; }
-            bool is_leaf(){ return this -> is_leaf; }
+            TreeNode(TreeNode& input){
+                this -> parent = input.parent;
+                this -> children = input.children;
+                this -> root = input.root;
+                this -> leaf = input.leaf;
+            }
 
-            public:
             TreeNode() {
                 this -> parent = nullptr;
                 this -> children = nullptr;
-                this -> is_root = false;
-                this -> is_leaf = false;
+                this -> root = false;
+                this -> leaf = false;
+            }
+
+            void addChild(std::shared_ptr<TreeNode> child){
+                this -> children -> push_back(child);
             }
         };
 
-        class RootTreeNode : TreeNode{
+        class RootTreeNode : TreeNode {
             protected:
             RootTreeNode() : TreeNode(true, false, nullptr){}
         };
@@ -64,7 +81,7 @@ namespace cnn_practice {
             DataStoreTreeNode(
                 bool is_leaf,
                 T value,
-                std::shared_ptr<TreeNode> parent,
+                std::shared_ptr<TreeNode> parent
             ) : LeafBearingTreeNode(is_leaf, parent){
                 this -> value = value;
             }
@@ -76,29 +93,50 @@ namespace cnn_practice {
             public:
             DataStoreTreeNode() : TreeNode(){}
         };
-    };
 
-    template <typename T> class Tree : RootTreeNode {
-        protected:
-        Tree(const T& input) : RootTreeNode(){
-            this -> add(T);
-        }
+        template <typename T> class Tree : RootTreeNode {
 
-        //Returns a reference to the final
-        //TreeNode found when searching for
-        //"input" in the tree. If "input"
-        //is not found, returns "nullptr".
+            
+            private:
 
-        virtual std::shared_ptr<TreeNode> walk(const T& input);
+            protected:
+            Tree(const T& input) : RootTreeNode(){
+                this -> add(input);
+            }
 
-        public:
-        Tree() : RootTreeNode(){};
-        Tree(Tree&& input) : RootTreeNode(input){};
+            //Returns a reference to the final
+            //TreeNode found when searching for
+            //"input" in the tree. If "input"
+            //is not found, returns "nullptr".
+
+            //namespacing required probably due to how virtuals
+            //are handled in the implementation.
+
+            //allow_prefix_match: Match as many characters
+            //    as possible in the input string, but
+            //    stop and return a reference to the last
+            //    matching character.
 
 
-        bool contains(const T& input) { return (this -> walk(input)) != nullptr; }
-        virtual void add(const T& input);
-        virtual std::vector<std::string> to_string();
+            virtual std::shared_ptr<
+                CN_COLL_NS(TreeNode)
+            > walk(const T& input){
+                throw new cnn_practice::error_handling::NotImplementedException();
+            }
+
+            public:
+            Tree() : RootTreeNode(){}
+            Tree(Tree&& input) : RootTreeNode(input){}
+
+            bool contains(const T& input) { return (this -> walk(input)) != nullptr; }
+
+            virtual void add(const T& input){
+                throw new cnn_practice::error_handling::NotImplementedException();
+            }
+            virtual std::vector<std::string> to_string(){
+                throw new cnn_practice::error_handling::NotImplementedException();
+            };
+        };
     };
 };
 #endif
