@@ -18,17 +18,18 @@ namespace cnn_practice {
             bool leaf;
 
             protected:
-            std::shared_ptr<TreeNode> parent;
-            std::shared_ptr<std::vector<TreeNode>> children;
+            std::shared_ptr<CN_COLL_NS(TreeNode)> parent;
+
+            public:
+            std::shared_ptr<std::vector<std::shared_ptr<CN_COLL_NS(TreeNode)>>> children;
 
             //protected:
             public:
-            TreeNode(bool root, bool leaf, std::shared_ptr<TreeNode> parent){
+            TreeNode(bool root, bool leaf, std::shared_ptr<CN_COLL_NS(TreeNode)> parent){
                 this -> parent = parent;
                 this -> root = root;
                 this -> leaf = leaf;
             }
-
             
             bool is_root(){ return this -> root; }
             bool is_leaf(){ return this -> leaf; }
@@ -55,7 +56,7 @@ namespace cnn_practice {
                 this -> leaf = false;
             }
 
-            void addChild(std::shared_ptr<TreeNode> child){
+            void addChild(std::shared_ptr<CN_COLL_NS(TreeNode)> child){
                 this -> children -> push_back(child);
             }
         };
@@ -69,7 +70,7 @@ namespace cnn_practice {
             protected:
             LeafBearingTreeNode(
                 bool is_leaf,
-                std::shared_ptr<TreeNode> parent
+                std::shared_ptr<CN_COLL_NS(TreeNode)> parent
             ) : TreeNode(false, is_leaf, parent) {}
         };
 
@@ -81,7 +82,7 @@ namespace cnn_practice {
             DataStoreTreeNode(
                 bool is_leaf,
                 T value,
-                std::shared_ptr<TreeNode> parent
+                std::shared_ptr<CN_COLL_NS(TreeNode)> parent
             ) : LeafBearingTreeNode(is_leaf, parent){
                 this -> value = value;
             }

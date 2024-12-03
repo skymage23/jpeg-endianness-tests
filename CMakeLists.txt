@@ -17,15 +17,16 @@ target_include_directories(trie
     PRIVATE ${CMAKE_CURRENT_LIST_DIR}/internal/include    
 )
 
-#if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-#    target_compile_options(trie
-#        PRIVATE -O0   #May want to move this outside CMake.
-#        PRIVATE -g
-#        PRIVATE -fsanitize=address
-#        PRIVATE -fsanitize=leak
-#        PRIVATE -Lasan
-#    )
-#endif()
+if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+    target_compile_options(trie
+        PRIVATE -O0   #May want to move this outside CMake.
+        PRIVATE -g
+        PRIVATE -Wno-error
+        PRIVATE -fsanitize=address
+        PRIVATE -fsanitize=leak
+        PRIVATE -Lasan
+    )
+endif()
 
 
 add_executable(opencv_load_jpeg_test ${PROJECT_SOURCE_DIR}/opencv_jpeg.cpp)

@@ -20,16 +20,16 @@ class CharStringTrie : Tree<std::string> {
     class __WalkResult{
         private:
         unsigned long char_match_count;
-        std::shared_ptr<TreeNode> end_tree_node;
+        std::shared_ptr<CN_COLL_NS(TreeNode)> end_tree_node;
 
         //Methods:
         public:
-        __WalkResult(int char_match, std::shared_ptr<TreeNode> end_node) :
+        __WalkResult(int char_match, std::shared_ptr<CN_COLL_NS(TreeNode)> end_node) :
             char_match_count(char_match), end_tree_node(end_node){}
 
         int get_char_match_count() { return this -> char_match_count; }
-        std::shared_ptr<TreeNode> get_end_tree_node { return this -> end_tree_node;}
-    }
+        std::shared_ptr<CN_COLL_NS(TreeNode)> get_end_tree_node() { return this -> end_tree_node;}
+    };
 
     private:
     int entry_count;
@@ -37,9 +37,9 @@ class CharStringTrie : Tree<std::string> {
 
     //Methods:
     protected:
-
-    __WalkResult __walk(const T& input, bool allow_prefix_match);
+    __WalkResult __walk(const std::string& input, bool allow_prefix_match);
     std::shared_ptr<CN_COLL_NS(TreeNode)> walk(const std::string&);
+
     void insert(
         const std::string& input,
         std::string::const_iterator input_start,
@@ -48,7 +48,7 @@ class CharStringTrie : Tree<std::string> {
 
     public:
     CharStringTrie() : Tree(){};
-    CharStringTrie(const std::string input) : Tree(input){};
+    CharStringTrie(const std::string input) : Tree(input){}
     CharStringTrie(CharStringTrie&& old);
 
     void add(const std::string& new_input);
