@@ -106,7 +106,73 @@ void CHAR_TRIE_MEMBER(add)(const std::string& input){
 
 
  std::vector<std::string> CHAR_TRIE_MEMBER(to_string)(){
+
+    //Helper classes:
+    /*struct StackEntry {
+        unsigned long index;
+        std::shared_ptr<TreeNode> node;
+
+        StackEntry(){
+            index = 0;
+            node = nullptr;
+        }
+
+        StackEntry(
+            unsigned long index,
+            std::shared_ptr<TreeNode> node
+        ) : index(index), node(node){}
+
+        StackEntry(StackEntry&& input){
+            this -> index = input.index;
+            this -> node = input.node;
+        }
+    }*/
+    
     std::vector<std::string> retval;
-     
+    char* char_buff = NULL;
+    int tree_level = 0;
+    unsigned long long_temp = 0;
+    //StackEntry curr_node;
+    std::shared_ptr<std::vector<std::shared_ptr<TreeNode>>> curr_vec = nullptr;
+    //std::vector<StackEntry> stack;
+    std::vector<std::shared_ptr<TreeNode>> stack;
+    std::shared_ptr<DataStoreTreeNode<char>> node_temp;
+
+    //Begin:
+    /*stack.push_back(
+        StackEntry(
+            0,
+            std::shared_ptr<TreeNode>(this, memory::EmptyDeleter())
+        )
+    );*/
+
+    stack.push_back(this -> children);
+    tree_level = 1;
+
+    while(!stack.empty()){
+        //curr_node = stack[stack.size() - 1];
+        curr_vec = stack[stack.size() - 1];
+        stack.pop_back();
+        
+        for(auto ptr : curr_vec){
+            if (!(ptr -> is_leaf())){
+                char_buff = new char[tree_level];
+                node_temp = std::static_cast<
+                    std::shared_ptr<CN_COLL_NS(DataStoreTreeNode<char>)>
+                >(ptr);
+                for (long_temp = tree_level - 1; long_temp != 0; long_temp--){
+                    char_buff[i] = node_temp -> value;
+                    node_temp = std::static_cast<
+                        std::shared_ptr<CN_COLL_NS(DataStoreTreeNode<char>)>
+                    >(node_temp -> parent);
+                }
+                char_buff[0] = node_temp -> value;
+                retval.push_back(std::string(char_buff));
+                delete char_buff;
+            }
+            stack.push_back(ptr -> children);
+        }
+        tree_level--;
+    } 
     return retval;
  }
