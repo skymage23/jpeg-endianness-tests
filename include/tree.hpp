@@ -3,7 +3,6 @@
 
 
 #include <error_handling/exceptions.hpp>
-#include <collections.hpp>
 
 #ifndef CNN_PRACTICE_TREE
 #define CNN_PRACTICE_TREE
@@ -14,94 +13,83 @@ namespace cnn_practice {
 
         class TreeNode {
             private:
-            bool root;
             bool leaf;
 
-            protected:
-            std::shared_ptr<CN_COLL_NS(TreeNode)> parent;
-
             public:
-            std::shared_ptr<std::vector<std::shared_ptr<CN_COLL_NS(TreeNode)>>> children;
+            std::shared_ptr<std::vector<std::shared_ptr<TreeNode>>> children;
+            std::shared_ptr<TreeNode> parent;
 
             //protected:
             public:
-            TreeNode(bool root, bool leaf, std::shared_ptr<CN_COLL_NS(TreeNode)> parent){
+            TreeNode(bool leaf, const std::shared_ptr<TreeNode> parent){
                 this -> parent = parent;
-                this -> root = root;
                 this -> leaf = leaf;
             }
             
-            bool is_root(){ return this -> root; }
             bool is_leaf(){ return this -> leaf; }
 
             public:
             TreeNode(TreeNode&& input){
                 this -> parent = input.parent;
                 this -> children = input.children;
-                this -> root = input.root;
                 this -> leaf = input.leaf;
             }
 
             TreeNode(TreeNode& input){
                 this -> parent = input.parent;
                 this -> children = input.children;
-                this -> root = input.root;
                 this -> leaf = input.leaf;
             }
 
             TreeNode() {
                 this -> parent = nullptr;
                 this -> children = nullptr;
-                this -> root = false;
                 this -> leaf = false;
             }
 
-            void addChild(std::shared_ptr<CN_COLL_NS(TreeNode)> child){
+            void addChild(std::shared_ptr<TreeNode> child){
                 this -> children -> push_back(child);
             }
         };
 
-        class RootTreeNode : TreeNode {
-            protected:
-            RootTreeNode() : TreeNode(true, false, nullptr){}
-        };
-
-        class LeafBearingTreeNode : TreeNode {
-            protected:
-            LeafBearingTreeNode(
-                bool is_leaf,
-                std::shared_ptr<CN_COLL_NS(TreeNode)> parent
-            ) : TreeNode(false, is_leaf, parent) {}
-        };
-
-        template <typename T> class DataStoreTreeNode : LeafBearingTreeNode{
-            public:
+        template <typename T> class DataStoreTreeNode : public TreeNode {
+            private:
             T value;
 
-            protected:
+            public:
+            DataStoreTreeNode() : TreeNode() {}
+            DataStoreTreeNode(DataStoreTreeNode<T>& input) : 
+                TreeNode(std::static_pointer_cast<TreeNode>(input)) {
+                this -> value = input.value;
+            }
+            DataStoreTreeNode(TreeNode& input) : TreeNode(input){}
             DataStoreTreeNode(
                 bool is_leaf,
-                T value,
-                std::shared_ptr<CN_COLL_NS(TreeNode)> parent
-            ) : LeafBearingTreeNode(is_leaf, parent){
+                const T& value,
+                std::shared_ptr<collections::DataStoreTreeNode<T>> parent
+            ) : TreeNode(is_leaf, parent){
                 this -> value = value;
             }
-
-            DataStoreTreeNode(DataStoreTreeNode&& input) : TreeNode(input) {
-                this -> value = value;
+            DataStoreTreeNode(DataStoreTreeNode&& input) : TreeNode(    
+                static_cast<TreeNode&&>(input) 
+            ){
+                this -> value = input.value;
             }
 
-            public:
-            DataStoreTreeNode() : TreeNode(){}
+            T getValue() {
+                return value;
+            }
         };
 
-        template <typename T> class Tree : RootTreeNode {
-
-            
-            private:
+        // T = externally expected API type.
+        // U = internal representation type.
+        // The two are not always the same.
+        template <typename T, typename U> class Tree {
+            protected:
+            std::shared_ptr<DataStoreTreeNode<U>> root;
 
             protected:
-            Tree(const T& input) : RootTreeNode(){
+            Tree(const T& input) {
                 this -> add(input);
             }
 
@@ -119,19 +107,20 @@ namespace cnn_practice {
             //    matching character.
 
 
-            virtual std::shared_ptr<
-                CN_COLL_NS(TreeNode)
-            > walk(const T& input){
+            virtual std::shared_ptr<TreeNode> walk(
+                __attribute__((unused)) const T& input
+            ){
                 throw new cnn_practice::error_handling::NotImplementedException();
             }
 
             public:
-            Tree() : RootTreeNode(){}
-            Tree(Tree&& input) : RootTreeNode(input){}
-
+            Tree() =  default;
+            Tree(Tree&& input) {
+                this -> root = input.root;
+            }
             bool contains(const T& input) { return (this -> walk(input)) != nullptr; }
 
-            virtual void add(const T& input){
+            virtual void add( __attribute__((unused)) const T& input){
                 throw new cnn_practice::error_handling::NotImplementedException();
             }
             virtual std::vector<std::string> to_string(){

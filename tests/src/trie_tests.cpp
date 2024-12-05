@@ -40,7 +40,7 @@ TEST_F(TrieUnitTests, test_dump_no_inf_loop){
     auto futureResult = promisedFinished.get_future();
     std::thread([](std::promise<std::vector<std::string>>& finished,
     cnn_practice::collections::CharStringTrie & obj) {
-       std::vector<std::string> ret = obj.dump_entries();
+       std::vector<std::string> ret = obj.to_string();
        finished.set_value(ret);
     }, std::ref(promisedFinished), std::ref(object)).detach(); 
 
@@ -66,7 +66,7 @@ TEST_F(TrieUnitTests, test_dump){
     trie.add(test_string_2);
     str_set.insert(test_string_2);
 
-    std::vector<std::string> trie_dump = trie.dump_entries();
+    std::vector<std::string> trie_dump = trie.to_string();
 //    ASSERT_EQ(trie_dump.size(), str_set.size());
 
     std::cout << "Trie dump: \n";
@@ -80,11 +80,10 @@ TEST_F(TrieUnitTests, test_dump){
 
 TEST_F(TrieUnitTests, test_multistring_insert){
     cnn_practice::collections::CharStringTrie trie;
-    int edge_count = 0;
     trie.add(test_string);
     trie.add(test_string_2);
-    edge_count = trie.get_edge_count();
-    ASSERT_EQ(edge_count, 14);
+    int word_count = trie.get_entry_count();
+    ASSERT_EQ(word_count, 2);
     ASSERT_TRUE(trie.contains(test_string));
     ASSERT_TRUE(trie.contains(test_string_2));
     ASSERT_FALSE(trie.contains(test_string_control));

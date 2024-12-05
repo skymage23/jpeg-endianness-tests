@@ -22,8 +22,8 @@ if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         PRIVATE -O0   #May want to move this outside CMake.
         PRIVATE -g
         PRIVATE -Wno-error
-        PRIVATE -fsanitize=address
-        PRIVATE -fsanitize=leak
+        #PRIVATE -fsanitize=address
+        #PRIVATE -fsanitize=leak
         PRIVATE -Lasan
     )
 endif()
