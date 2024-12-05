@@ -10,70 +10,44 @@
 
 namespace cnn_practice {
     namespace collections {
-
-        class TreeNode {
+        template <typename T> class DataStoreTreeNode {
             private:
             bool leaf;
-
-            public:
-            std::shared_ptr<std::vector<std::shared_ptr<TreeNode>>> children;
-            std::shared_ptr<TreeNode> parent;
-
-            //protected:
-            public:
-            TreeNode(bool leaf, const std::shared_ptr<TreeNode> parent){
-                this -> parent = parent;
-                this -> leaf = leaf;
-            }
-            
-            bool is_leaf(){ return this -> leaf; }
-
-            public:
-            TreeNode(TreeNode&& input){
-                this -> parent = input.parent;
-                this -> children = input.children;
-                this -> leaf = input.leaf;
-            }
-
-            TreeNode(TreeNode& input){
-                this -> parent = input.parent;
-                this -> children = input.children;
-                this -> leaf = input.leaf;
-            }
-
-            TreeNode() {
-                this -> parent = nullptr;
-                this -> children = nullptr;
-                this -> leaf = false;
-            }
-
-            void addChild(std::shared_ptr<TreeNode> child){
-                this -> children -> push_back(child);
-            }
-        };
-
-        template <typename T> class DataStoreTreeNode : public TreeNode {
-            private:
             T value;
 
             public:
-            DataStoreTreeNode() : TreeNode() {}
-            DataStoreTreeNode(DataStoreTreeNode<T>& input) : 
-                TreeNode(std::static_pointer_cast<TreeNode>(input)) {
+            std::shared_ptr<std::vector<std::shared_ptr<DataStoreTreeNode<T>>>> children;
+            std::shared_ptr<DataStoreTreeNode<T>> parent;
+
+            //protected:
+            public:
+            DataStoreTreeNode() = delete;
+            DataStoreTreeNode(T value, bool leaf, const std::shared_ptr<DataStoreTreeNode> parent){
+                this -> parent = parent;
+                this -> leaf = leaf;
+                this -> value = value;
+                this -> children = std::shared_ptr<
+                    std::vector<std::shared_ptr<DataStoreTreeNode<T>>>
+                >(new std::vector<std::shared_ptr<DataStoreTreeNode<T>>>());
+            }
+             
+            DataStoreTreeNode(DataStoreTreeNode&& input){
+                this -> parent = input.parent;
+                this -> children = input.children;
+                this -> leaf = input.leaf;
                 this -> value = input.value;
             }
-            DataStoreTreeNode(TreeNode& input) : TreeNode(input){}
-            DataStoreTreeNode(
-                bool is_leaf,
-                const T& value,
-                std::shared_ptr<collections::DataStoreTreeNode<T>> parent
-            ) : TreeNode(is_leaf, parent){
+
+            DataStoreTreeNode(DataStoreTreeNode& input){
+                this -> parent = input.parent;
+                this -> children = input.children;
+                this -> leaf = input.leaf;
                 this -> value = value;
             }
-            DataStoreTreeNode(DataStoreTreeNode&& input) : TreeNode(    
-                static_cast<TreeNode&&>(input) 
-            ){
-                this -> value = input.value;
+
+            bool is_leaf(){ return this -> leaf; }
+            void addChild(std::shared_ptr<DataStoreTreeNode<T>> child){
+                this -> children -> push_back(child);
             }
 
             T getValue() {
@@ -88,37 +62,36 @@ namespace cnn_practice {
             protected:
             std::shared_ptr<DataStoreTreeNode<U>> root;
 
-            protected:
+            public:
+            Tree() {
+                this -> root = std::shared_ptr<DataStoreTreeNode<char>>(
+                    new DataStoreTreeNode<char>(
+                        '\0',
+                        false,
+                        nullptr
+                    )
+                );
+            }
+
+            Tree(Tree&& input) {
+                this -> root = input.root;
+            }
+
             Tree(const T& input) {
                 this -> add(input);
             }
 
-            //Returns a reference to the final
-            //TreeNode found when searching for
-            //"input" in the tree. If "input"
-            //is not found, returns "nullptr".
-
-            //namespacing required probably due to how virtuals
-            //are handled in the implementation.
-
-            //allow_prefix_match: Match as many characters
-            //    as possible in the input string, but
-            //    stop and return a reference to the last
-            //    matching character.
-
-
-            virtual std::shared_ptr<TreeNode> walk(
+            virtual std::shared_ptr<DataStoreTreeNode<U>> walk(
                 __attribute__((unused)) const T& input
             ){
                 throw new cnn_practice::error_handling::NotImplementedException();
-            }
+            };
 
-            public:
-            Tree() =  default;
-            Tree(Tree&& input) {
-                this -> root = input.root;
+            virtual bool contains(
+                __attribute__((unused)) const T& input
+            ) { 
+                throw new cnn_practice::error_handling::NotImplementedException();
             }
-            bool contains(const T& input) { return (this -> walk(input)) != nullptr; }
 
             virtual void add( __attribute__((unused)) const T& input){
                 throw new cnn_practice::error_handling::NotImplementedException();

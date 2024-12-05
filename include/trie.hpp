@@ -9,8 +9,6 @@
 
 #include <tree.hpp>
 
-using cnn_practice::collections::TreeNode;
-
 //Type definitions:
 namespace cnn_practice {
     namespace collections {
@@ -18,19 +16,16 @@ namespace cnn_practice {
 class CharStringTrie : public Tree<std::string, char> {
 
     private:
-    //Private classes:
-    class WalkResult{
-        private:
+    struct WalkResult{
         unsigned long char_match_count;
-        std::shared_ptr<TreeNode> end_tree_node;
-
-        //Methods:
-        public:
-        WalkResult(int char_match, const std::shared_ptr<TreeNode> end_node) :
-            char_match_count(char_match), end_tree_node(end_node){}
-
-        unsigned long get_char_match_count() { return this -> char_match_count; }
-        std::shared_ptr<TreeNode> get_end_tree_node() { return this -> end_tree_node;}
+        std::shared_ptr<DataStoreTreeNode<char>> end_tree_node;
+        WalkResult(
+            unsigned long char_match_count,
+            std::shared_ptr<DataStoreTreeNode<char>> end_node
+        ){
+            this -> char_match_count = char_match_count;
+            this -> end_tree_node = end_node;
+        }
     };
 
     private:
@@ -39,43 +34,23 @@ class CharStringTrie : public Tree<std::string, char> {
     //Methods:
     protected:
     WalkResult trie_walk(const std::string& input, bool allow_prefix_match);
-    std::shared_ptr<TreeNode> walk(const std::string&);
 
+/*
     void insert(
         const std::string& input,
         std::string::const_iterator input_start,
         std::shared_ptr<DataStoreTreeNode<char>> node_start    
     );
-
-    public:
-    CharStringTrie() : Tree(),entry_count(0){};
-    CharStringTrie(const std::string& input) : Tree(input), entry_count(1){}
-    CharStringTrie(CharStringTrie&& old) : 
-        Tree(static_cast<Tree&&>(old))
-    {
-        this -> root = old.root;
-    }
-
-    void add(const std::string& new_input);
-/*    bool contains(const std::string& str_to_check);
-    bool contains(
-        std::string::const_iterator begin,
-        std::string::const_iterator end
-    );
-
-    bool contains(
-        std::string::reverse_iterator begin,
-        std::string::reverse_iterator end
-    );
-
-    bool contains(
-        std::string::iterator begin,
-        std::string::iterator end
-    );
-
-    int get_entry_count() { return this -> entry_count };
 */
-    std::vector<std::string> to_string();
+    public:
+    CharStringTrie();
+    CharStringTrie(const std::string& input);
+    CharStringTrie(CharStringTrie&& old);
+
+    std::shared_ptr<DataStoreTreeNode<char>> walk(const std::string& input) override;
+    bool contains(const std::string& input) override;
+    void add(const std::string& new_input) override;
+    std::vector<std::string> to_string() override;
     int get_entry_count(){ return this -> entry_count; }
 };
 
