@@ -31,8 +31,5 @@ endif()
 
 add_executable(opencv_load_jpeg_test ${PROJECT_SOURCE_DIR}/opencv_jpeg.cpp)
 target_include_directories(opencv_load_jpeg_test  PRIVATE ${OpenCV_INCLUDE_DIRS})
-target_link_libraries(opencv_load_jpeg_test
-    trie
-)
 
 add_subdirectory(tests)
