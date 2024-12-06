@@ -3,11 +3,10 @@
 #include <filesystem>
 #include <iostream>
 #include <memory>
+#include <regex>
 #include <string>
 #include <vector>
 
-
-#include <trie.hpp>
 namespace fs = std::filesystem;
 
 //Constants:
@@ -17,7 +16,7 @@ const std::string image_dir_name = "test_images";
 
 //Type definitions:
 typedef struct Config{
-    cnn_practice::collections::CharStringTrie filetype_trie;
+    std::regex matcher("\.(?:jpeg|jpg)+$");
 } Config;
 
 std::string convert_to_lowercase(std::string input){
@@ -29,16 +28,13 @@ std::string convert_to_lowercase(std::string input){
 
 std::shared_ptr<Config> get_config(){
     std::shared_ptr<Config> retval(new Config);
-    //Makes searching trivial:
-    retval -> filetype_trie.add(".gepj");
-    retval -> filetype_trie.add(".gpj");
     return retval;
 }
 
 
 bool is_jpeg_file(const std::shared_ptr<Config> config, const fs::path& file){
     std::string filename = convert_to_lowercase(file.filename());
-    return config -> filetype_trie.starts_with_value_in_trie(filename.rbegin(), filename.rend());
+    return std::regex_match(filename, config -> matcher); 
 }
 
 //This isn't working correctly.
