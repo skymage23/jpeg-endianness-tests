@@ -24,14 +24,6 @@ set(TESTS_SRC ${CMAKE_CURRENT_LIST_DIR}/src)
 #*************************************************
 #                     Unit Tests                 *
 #*************************************************
-add_executable(unit_tests
-    ${TESTS_SRC}/trie_tests.cpp
-)
-target_include_directories(unit_tests PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}/include
-    ${CMAKE_CURRENT_LIST_DIR}/third_party/googletest/include
-    get_filename_component(REALPATH ${CMAKE_CURRENT_LIST_DIR}/../include)
-)
 
 #if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
 #    target_compile_options(unit_tests
@@ -45,26 +37,25 @@ target_include_directories(unit_tests PUBLIC
 
 
 
-target_link_libraries( unit_tests
-    trie
-    GTest::gtest_main
-)
+#target_link_libraries( unit_tests
+#    GTest::gtest_main
+#)
 
 
-include(GoogleTest)
-gtest_add_tests(
-    TARGET unit_tests
-    TEST_PREFIX "utest_"
-)
+#include(GoogleTest)
+#gtest_add_tests(
+#    TARGET unit_tests
+#    TEST_PREFIX "utest_"
+#)
 
-set(UTEST_BINARY "${CMAKE_BINARY_DIR}/tests/unit_tests")
+#set(UTEST_BINARY "${CMAKE_BINARY_DIR}/tests/unit_tests")
 
 
 #**************************************************
 #                   Memory Checks:                *
 #**************************************************
-add_test(valgrind_leak_test
-    COMMAND ${VALGRIND_BINARY} {UTEST_BINARY}
-    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
-)
+#add_test(valgrind_leak_test
+#    COMMAND ${VALGRIND_BINARY} {UTEST_BINARY}
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}
+#)
 

@@ -40,13 +40,9 @@ bool is_jpeg_file(const std::shared_ptr<Config> config, const fs::path& file){
 //This isn't working correctly.
 //It fails when the CWD is already the project root.
 std::shared_ptr<fs::path> get_project_dirtree_path(){
-    //fs::path prev_path = fs::current_path();
-    //fs::path path_check = prev_path.parent_path();
     fs::path path_check = fs::current_path();
 
     bool found = false;
-    //When we are at the root_dir, current path and parent path
-    //are the same.
     while (path_check != path_check.parent_path() && !found ){
 	    if (path_check.filename() != proj_dir_name){
 	        path_check = path_check.parent_path();
