@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <opencv4/opencv2/opencv.hpp>
+
 namespace fs = std::filesystem;
 
 //Constants:
@@ -15,14 +17,13 @@ const std::string image_dir_name = "test_images";
 
 
 //Type definitions:
-typedef struct Config{
-    std::regex matcher("\.(?:jpeg|jpg)+$");
-} Config;
+struct Config {
+    std::string filecheck_pattern = R"(\.(?:jpeg|jpg)+$)";
+};
 
 std::string convert_to_lowercase(std::string input){
     std::transform(input.begin(), input.end(), input.begin(),
-    [](unsigned char c){ return std::tolower(c); });
-    
+    [](unsigned char c){ return std::tolower(c); });    
     return input;
 }
 
@@ -33,12 +34,25 @@ std::shared_ptr<Config> get_config(){
 
 
 bool is_jpeg_file(const std::shared_ptr<Config> config, const fs::path& file){
-    std::string filename = convert_to_lowercase(file.filename());
-    return std::regex_match(filename, config -> matcher); 
+    std::string filename = convert_to_lowercase(file.filename()); 
+    std::smatch match;
+    std::regex matcher (
+        config -> filecheck_pattern,
+        std::regex::ECMAScript); //JavaScript syntax.
+
+    bool retval = std::regex_search(
+        filename,
+        match,
+        matcher,
+        std::regex_constants::match_default
+    );
+    std::cerr << "Match ready: " << match.ready()
+              << " Match size: " << match.size()
+              << " Match empty: " << match.empty()
+              << "\n\n";
+    return retval;
 }
 
-//This isn't working correctly.
-//It fails when the CWD is already the project root.
 std::shared_ptr<fs::path> get_project_dirtree_path(){
     fs::path path_check = fs::current_path();
 
@@ -72,19 +86,19 @@ std::shared_ptr<fs::path> get_image_directory_path(
     return std::shared_ptr<fs::path>(new fs::path(curr_path));
 }
 
-std::vector<std::string> get_jpeg_image_paths(
+std::vector<fs::path> get_jpeg_image_paths(
     std::shared_ptr<Config> config,
     std::shared_ptr<fs::path> image_path
 ){
     fs::path p_temp;
-    std::vector<std::string> retval;
+    std::vector<fs::path> retval;
     for(
-        const fs::directory_entry dir_ent : 
+        const fs::directory_entry& dir_ent : 
         fs::recursive_directory_iterator(image_path -> string())
     ){   
         p_temp = dir_ent.path();
         if(is_jpeg_file(config, p_temp)){
-            retval.push_back(p_temp.filename());
+            retval.push_back(p_temp);
         }
     };
 
@@ -92,6 +106,7 @@ std::vector<std::string> get_jpeg_image_paths(
 }
 
 int main (){
+    std::string temp;
     std::shared_ptr<Config> config = get_config(); 
     std::shared_ptr<fs::path> proj_path = get_project_dirtree_path();
     if (proj_path == nullptr){
@@ -109,12 +124,18 @@ int main (){
 
     std::cout << image_path -> string() << "\n";
 
-    std::vector<std::string> images = get_jpeg_image_paths(config, image_path);
+    std::vector<fs::path> images = get_jpeg_image_paths(config, image_path);
     
     std::cout << "******************************************\n";
     
     for(auto elem : images){
-        std::cout << elem << "\n";
+        temp = elem.generic_string();
+        std::cout << temp << "\n";
+        cv::Mat image = cv::imread(temp);
+        cv::namedWindow(temp, cv::WINDOW_NORMAL);
+        cv::imshow(temp, image);
+        cv::resizeWindow(temp, 800, 600); //VGA
+        cv::waitKey(0);
     }
 
     std::cout << "\n";
