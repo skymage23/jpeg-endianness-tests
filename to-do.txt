@@ -1,2 +1,4 @@
-1. Finish Trie implementation.
 2. Finish code to use trie to check for JPEG file extensions.
+
+Add mechanism to mark fail and kill the process if we encounter an unrecoverable
+error DURING INITIALIZATION.
