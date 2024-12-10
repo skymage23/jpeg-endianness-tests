@@ -1,0 +1,20 @@
+// Place your key bindings in this file to override the defaults
+[
+    {
+        "key": "ctrl+t",
+        "command": "workbench.action.tasks.runTask",
+        "args": "compile: build tests"
+    },
+
+    {
+        "key": "ctrl+b",
+        "command": "workbench.action.tasks.runTask",
+        "args": "compile: build main"
+    },
+
+    {
+        "key": "ctrl+r",
+        "command": "workbench.action.tasks.runTask",
+        "args": "compile: main: full rebuild"
+    }
+]
