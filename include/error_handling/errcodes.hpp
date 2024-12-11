@@ -35,7 +35,6 @@ namespace cnn_practice {
         };
 
         std::shared_ptr<ErrCodes> errcode_singleton = std::shared_ptr<ErrCodes>(new ErrCodes());
-        #include <internal/error_handling/config.inc>
     };
 };
 #endif

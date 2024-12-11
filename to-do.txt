@@ -2,3 +2,9 @@
 
 Add mechanism to mark fail and kill the process if we encounter an unrecoverable
 error DURING INITIALIZATION.
+
+Logging and error handling, because they are needed during the creation
+of the global config, are created independently of the global config
+and then added to it later.
+
+Work on the initializtion code.
