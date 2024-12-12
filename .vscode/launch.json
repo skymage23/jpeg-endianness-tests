@@ -19,14 +19,17 @@
             "request": "launch",
             "program": "${workspaceFolder}/build/tests/unit_tests",
             "cwd": "${workspaceFolder}",
-            "environment": [
-                {
-                    "name": "DISABLE_GTEST_SKIP",
-                    "value": "True"
-                }
-            ],
             "MIMode": "gdb",
             "miDebuggerPath": "/usr/bin/gdb"
+        }, {
+            "name": "Debug initialization basic errcode handling",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/tests/initialization/error_handling/test_basic_error_handling",
+            "cwd": "${workspaceFolder}",
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb"
+
         }
     ]
 }

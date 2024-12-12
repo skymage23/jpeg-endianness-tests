@@ -60,42 +60,47 @@ namespace cnn_practice {
                 va_list args;
                 va_start(args, log_type);
                 
-                if(errcode > errcode_max){
+                if(errcode > ERRCODE_MAX){
                     return nullptr;
                 }
 
                 switch(errcode){
-                    case success: {
+                    case SUCCESS: {
                         temp = generate_string__success();
                         break;
                     }
-                    case invalid_errcode: {
+                    case INVALID_ERRCODE: {
                         unsigned int input = va_arg(args, unsigned int);
                         temp = generate_string__invalid_errcode(input);
                         break;
                     }
-                    case out_of_memory: {
+                    case OUT_OF_MEMORY: {
                         temp = generate_string__out_of_memory();
                         break;
                     }
-                    case unrecognized_argument: {
+                    case UNRECOGNIZED_ARGUMENT: {
                         //variadic:
                         std::string arg = va_arg(args, std::string);
                         temp = generate_string__unrecognized_argument(arg);
                         break;
                     }
-                    case too_few_arguments: {
+                    case TOO_FEW_ARGUMENTS: {
                         temp = generate_string__too_few_arguments();
                         break;
                     }
-                    case too_many_arguments: {
+                    case TOO_MANY_ARGUMENTS: {
                         temp = generate_string__too_many_arguments();
                         break;
                     }
-                    case file_write_error:{
+                    case FILE_WRITE_ERROR: {
                         //variadic:
                         std::string filename = va_arg(args, std::string);
                         temp = generate_string__file_write_error(filename);
+                        break;
+                    }
+                    default: {
+                        return nullptr;
+                        break;
                     }
                 };
                 temp = std::format("{}: {}", log_type, temp);
@@ -103,7 +108,7 @@ namespace cnn_practice {
             }            
             
             void print_err(std::shared_ptr<std::string> message){
-                std::cerr << message;
+                std::cerr << *message;
             }
 
             void fatal(const unsigned int errcode, ...) {
@@ -111,7 +116,7 @@ namespace cnn_practice {
                 va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "FATAL", args);
                 if(msg == nullptr){
-                    msg = generate_error_string(invalid_errcode, "FATAL");
+                    msg = generate_error_string(INVALID_ERRCODE, "FATAL", errcode);
                 }
                 print_err(msg);
                 exit(EXIT_FAILURE);  
@@ -122,7 +127,7 @@ namespace cnn_practice {
                 va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "WARN", args);
                 if (msg == nullptr){
-                    fatal(invalid_errcode, errcode);                
+                    fatal(INVALID_ERRCODE, errcode);                
                 }
                 print_err(msg);
             }
@@ -132,7 +137,7 @@ namespace cnn_practice {
                 va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "DEBUG", args);
                 if (msg == nullptr){
-                    fatal(invalid_errcode, errcode);                    
+                    fatal(INVALID_ERRCODE, errcode);                    
                 }
                 print_err(msg);
             }
