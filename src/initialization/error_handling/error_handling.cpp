@@ -58,6 +58,7 @@ namespace cnn_practice {
             std::shared_ptr<std::string> generate_error_string(const unsigned int errcode, std::string log_type, ...){
                 std::string temp;
                 va_list args;
+                va_start(args, log_type);
                 
                 if(errcode > errcode_max){
                     return nullptr;
@@ -107,6 +108,7 @@ namespace cnn_practice {
 
             void fatal(const unsigned int errcode, ...) {
                 va_list args;
+                va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "FATAL", args);
                 if(msg == nullptr){
                     msg = generate_error_string(invalid_errcode, "FATAL");
@@ -117,6 +119,7 @@ namespace cnn_practice {
 
             void warn(const unsigned int errcode, ...){
                 va_list args;
+                va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "WARN", args);
                 if (msg == nullptr){
                     fatal(invalid_errcode, errcode);                
@@ -126,6 +129,7 @@ namespace cnn_practice {
 
             void debug(const unsigned int errcode, ...) {
                 va_list args;
+                va_start(args, errcode);
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "DEBUG", args);
                 if (msg == nullptr){
                     fatal(invalid_errcode, errcode);                    
