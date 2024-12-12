@@ -1,3 +1,4 @@
+add_subdirectory(error_handling)
 add_library(initialization STATIC
     ${PROJECT_SOURCE_DIR}/initialization/initialization.cpp
 )

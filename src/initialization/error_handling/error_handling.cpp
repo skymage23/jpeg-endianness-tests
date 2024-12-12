@@ -5,12 +5,16 @@
 #include <memory>
 #include <string>
 
-#include <initialization/error_handling/errcodes.hpp>
+#include <initialization/error_handling/basic_error_handling.hpp>
 namespace cnn_practice {
     namespace initialization {
         namespace error_handling {
             std::string generate_string__success(){
                 return "Success.";
+            }
+
+            std::string generate_string__invalid_errcode(unsigned int errcode){
+                return std::format("Invalid errcode: {} ", errcode);
             }
             
             std::string generate_string__out_of_memory(){
@@ -27,7 +31,7 @@ namespace cnn_practice {
             }
             
             std::string generate_string__too_many_arguments(){
-                return "Too many arguments.\n",
+                return "Too many arguments.\n";
             }
             
             std::string generate_string__too_few_arguments(){
@@ -51,7 +55,7 @@ namespace cnn_practice {
             //case the coder who wrote the beginnings of the case statement
             //has moved on to another part of the code before they finished.
             //
-            std::unique_ptr<std::string> generate_error_string(int errcode, std::string log_type, ...){
+            std::shared_ptr<std::string> generate_error_string(const unsigned int errcode, std::string log_type, ...){
                 std::string temp;
                 va_list args;
                 
@@ -59,48 +63,74 @@ namespace cnn_practice {
                     return nullptr;
                 }
 
-                case(errcode){
-                    success:
+                switch(errcode){
+                    case success: {
                         temp = generate_string__success();
                         break;
-                    out_of_memory:
+                    }
+                    case invalid_errcode: {
+                        unsigned int input = va_arg(args, unsigned int);
+                        temp = generate_string__invalid_errcode(input);
+                        break;
+                    }
+                    case out_of_memory: {
                         temp = generate_string__out_of_memory();
                         break;
-                    unrecognized_argument:
+                    }
+                    case unrecognized_argument: {
                         //variadic:
                         std::string arg = va_arg(args, std::string);
                         temp = generate_string__unrecognized_argument(arg);
                         break;
-                    too_few_arguments:
+                    }
+                    case too_few_arguments: {
                         temp = generate_string__too_few_arguments();
                         break;
-                    too_many_arguments:
+                    }
+                    case too_many_arguments: {
                         temp = generate_string__too_many_arguments();
                         break;
-                    file_write_error:
+                    }
+                    case file_write_error:{
                         //variadic:
                         std::string filename = va_arg(args, std::string);
                         temp = generate_string__file_write_error(filename);
+                    }
                 };
                 temp = std::format("{}: {}", log_type, temp);
-                return std::unique_ptr<std::string>(temp);
+                return std::shared_ptr<std::string>(new std::string(temp));
             }            
             
-            void print_err(std::string& message){
+            void print_err(std::shared_ptr<std::string> message){
                 std::cerr << message;
             }
 
-            void warn(int errcode, ...){
-                print_err(generate_error_string("WARN", /*va_args*/ ));
+            void fatal(const unsigned int errcode, ...) {
+                va_list args;
+                std::shared_ptr<std::string> msg = generate_error_string(errcode, "FATAL", args);
+                if(msg == nullptr){
+                    msg = generate_error_string(invalid_errcode, "FATAL");
+                }
+                print_err(msg);
+                exit(EXIT_FAILURE);  
             }
 
-            void debug(int errcode, ...){
-                print_err(generate_error_string("DEBUG:", /*va_args*/));
+            void warn(const unsigned int errcode, ...){
+                va_list args;
+                std::shared_ptr<std::string> msg = generate_error_string(errcode, "WARN", args);
+                if (msg == nullptr){
+                    fatal(invalid_errcode, errcode);                
+                }
+                print_err(msg);
             }
 
-            [[noreturn]] void fatal(int errcode) {
-                print_err(generate_error_string("FATAL", /*va_args*/));
-                exit(EXIT_FAILURE);    
+            void debug(const unsigned int errcode, ...) {
+                va_list args;
+                std::shared_ptr<std::string> msg = generate_error_string(errcode, "DEBUG", args);
+                if (msg == nullptr){
+                    fatal(invalid_errcode, errcode);                    
+                }
+                print_err(msg);
             }
         };
     };

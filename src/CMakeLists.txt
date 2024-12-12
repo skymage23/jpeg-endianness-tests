@@ -18,4 +18,3 @@ add_library (config STATIC
 target_include_directories(config
     PUBLIC ${CMAKE_CURRENT_LIST_DIR}/include
 )
-

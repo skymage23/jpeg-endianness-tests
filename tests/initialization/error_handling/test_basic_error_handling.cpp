@@ -3,7 +3,7 @@
 
 #include <gtest/gtest.h>
 
-#include <initialization/error_handling/basic_error_code_handlings.hpp>
+#include <initialization/error_handling/basic_error_handling.hpp>
 
 TEST(
     test_basic_error_handling,
@@ -11,7 +11,7 @@ TEST(
 ){
     //Hello:
     int test_errcode = INT32_MAX;
-    std::unique_ptr<std::string> err_str = 
+    std::shared_ptr<std::string> err_str = 
         cnn_practice::initialization::error_handling::generate_error_string( 
         test_errcode,
         "TEST" 

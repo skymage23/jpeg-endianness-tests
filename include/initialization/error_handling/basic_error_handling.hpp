@@ -1,27 +1,32 @@
 #ifndef JPEG_ENDIANNESS_TESTS_INCLUDE_INITIALIZATION_ERROR_HANDLING_BASIC_ERROR_HANDLING
 #define JPEG_ENDIANNESS_TESTS_INCLUDE_INITIALIZATION_ERROR_HANDLING_BASIC_ERROR_HANDLING
 
+#include <memory>
+#include <string>
+
 namespace cnn_practice {
     namespace initialization {
         namespace error_handling {
-            const unsigned int errcode_min = 0;
+            constexpr unsigned int errcode_min = 0;
 
             //If you add new errcodes, increment this value by
             //one for each errcode you add.
-            const unsigned int errcode_max = 5;
+            constexpr unsigned int errcode_max = 6;
 
-            unsigned int success = 0;
-            unsigned int out_of_memory = 1;
-            unsigned int unrecognized_argument = 2;
-            unsigned int too_few_arguments = 3;
-            unsigned int too_many_arguments = 4;
-            unsigned int file_write_error = 5;
+            constexpr unsigned int success = 0;
+            constexpr unsigned int invalid_errcode = 1; 
+            constexpr unsigned int out_of_memory = 2;
+            constexpr unsigned int unrecognized_argument = 3;
+            constexpr unsigned int too_few_arguments = 4;
+            constexpr unsigned int too_many_arguments = 5;
+            constexpr unsigned int file_write_error = 6;
             //int file_read_error = 6;
 
-            std::string[] error_names = {
+            std::string error_names[] = {
                 //Hello:
                 //success:
                 "success",
+                "invalid errcode",
                 "out_of_memory",
                 "unrecognized_argument",
                 "too_few_arguments",
@@ -30,6 +35,7 @@ namespace cnn_practice {
             };
 
             std::string generate_string__success();
+            std::string generate_string__invalid_errcode();
             std::string generate_string__out_of_memory();
             std::string generate_string__unrecognized_argument(); 
             std::string generate_string__too_many_arguments();
@@ -47,11 +53,12 @@ namespace cnn_practice {
             //case the coder who wrote the beginnings of the case statement
             //has moved on to another part of the code before they finished.
             //
-            std::unique_ptr<std::string> generate_error_string(int errcode, std::string log_type, ...);             
+            std::shared_ptr<std::string> generate_error_string(int errcode, std::string log_type, ...);             
             void print_err(std::string& message);
-            void warn(int errcode, ...);
-            void debug(int errcode, ...);
-            void fatal(int errcode);
+            void warn(unsigned int errcode, ...);
+            void debug(unsigned int errcode, ...);
+
+            [[noreturn]] void fatal(unsigned int errcode);
         };
     };
 };

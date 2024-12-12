@@ -3,5 +3,5 @@ add_library(initialization_error_handling STATIC
 )
 
 target_include_directories(initialization_error_handling
-    ${PROJECT_SOURCE_DIR}/include
+    PUBLIC  ${CMAKE_SOURCE_DIR}/include
 )

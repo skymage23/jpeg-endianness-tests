@@ -8,6 +8,7 @@ add_compile_options(-std=c++2b -Wall -Wextra -Wpedantic -Werror)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
         add_compile_options(-O0 -g -Wno-error -Lasan)
+        
 endif()
 
 

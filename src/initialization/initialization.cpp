@@ -5,7 +5,7 @@ namespace cnn_practice {
     namespace initialization {
         //Sets up global structures and the base level
         //try/catch block.
-        int main(int argc, char*[] argv) {
+        int main(int argc, char* argv[]) {
             //Initialization:
             //Sets up global structures:
 
@@ -15,9 +15,9 @@ namespace cnn_practice {
             
 
             //Runtime try/catch:
-            try{
+           // try{
 
-            } catch ()
+           // } catch ()
             return 0;
         }
     };

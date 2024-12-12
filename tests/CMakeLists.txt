@@ -34,6 +34,7 @@ include(GoogleTest)
 
 #set(UTEST_BINARY "${CMAKE_BINARY_DIR}/tests/unit_tests")
 
+add_subdirectory(initialization)
 
 #**************************************************
 #                   Memory Checks:                *
