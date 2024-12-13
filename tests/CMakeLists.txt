@@ -12,7 +12,6 @@ else()
     message(STATUS "Using Valgrind: ${VALGRIND_BINARY}")
 endif()
 
-
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/third_party/googletest)
 include(GoogleTest)
 

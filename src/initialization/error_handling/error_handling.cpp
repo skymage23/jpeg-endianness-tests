@@ -1,4 +1,9 @@
 #include <cstdarg>
+
+#ifdef NDEBUG
+#include <stdio.h>
+#endif
+
 #include <cstdint>
 #include <format>
 #include <iostream>
@@ -9,6 +14,18 @@
 namespace cnn_practice {
     namespace initialization {
         namespace error_handling {
+
+            #ifdef NDEBUG
+            const char* variadic_print_prefix = "Variadic arg: {}\n";
+            void print_variadic_arg_list(const char* prefix, ...){
+                va_list args;
+                va_start(args, prefix);
+                vprintf(prefix, args);
+                va_end(args);
+                return;
+            }
+            #endif
+
             std::string generate_string__success(){
                 return "Success.";
             }
@@ -59,6 +76,10 @@ namespace cnn_practice {
                 std::string temp;
                 va_list args;
                 va_start(args, log_type);
+
+                #ifdef NDEBUG
+                    print_variadic_arg_list(variadic_print_prefix, args);
+                #endif 
                 
                 if(errcode > ERRCODE_MAX){
                     return nullptr;
@@ -70,6 +91,9 @@ namespace cnn_practice {
                         break;
                     }
                     case INVALID_ERRCODE: {
+                        #ifdef NDEBUG
+                            print_variadic_arg_list(variadic_print_prefix, args);
+                        #endif
                         unsigned int input = va_arg(args, unsigned int);
                         temp = generate_string__invalid_errcode(input);
                         break;
@@ -96,10 +120,6 @@ namespace cnn_practice {
                         //variadic:
                         std::string filename = va_arg(args, std::string);
                         temp = generate_string__file_write_error(filename);
-                        break;
-                    }
-                    default: {
-                        return nullptr;
                         break;
                     }
                 };

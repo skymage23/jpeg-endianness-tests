@@ -7,7 +7,7 @@ set(PROJECT_SOURCE_DIR ${PROJECT_SOURCE_DIR}/src)
 add_compile_options(-std=c++2b -Wall -Wextra -Wpedantic -Werror)
 
 if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
-        add_compile_options(-O0 -g)
+        add_compile_options(-O0 -g -DNDEBUG)
         
 endif()
 

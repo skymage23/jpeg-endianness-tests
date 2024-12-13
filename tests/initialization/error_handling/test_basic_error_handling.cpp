@@ -43,15 +43,12 @@ TEST(
     test_basic_error_handling,
     test_basic_error_handling_test_warn_pivot_to_fatal 
 ) {
-    auto test_code = [](){
-        unsigned int test_errcode = UINT32_MAX;
-        cnn_practice::initialization::error_handling::warn(test_errcode);
-        exit(EXIT_SUCCESS);
-    };
-
-    EXPECT_EXIT(
-        test_code(),
-        testing::ExitedWithCode(EXIT_FAILURE),
+    EXPECT_DEBUG_DEATH(
+        {
+            unsigned int test_errcode = UINT32_MAX;
+            cnn_practice::initialization::error_handling::warn(test_errcode);
+            exit(EXIT_SUCCESS);
+        },
         std::format("FATAL: Invalid errcode: {}", UINT32_MAX)
     );
 }
@@ -61,15 +58,12 @@ TEST(
     test_basic_error_handling,
     test_basic_error_handling_test_debug_pivot_to_fatal 
 ) {
-    auto test_code = [](){
-        unsigned int test_errcode = UINT32_MAX;
-        cnn_practice::initialization::error_handling::debug(test_errcode);
-        exit(EXIT_SUCCESS);
-    };
-
-    EXPECT_EXIT(
-        test_code(),
-        testing::ExitedWithCode(EXIT_FAILURE),
+    EXPECT_DEBUG_DEATH(
+        {
+            unsigned int test_errcode = UINT32_MAX;
+            cnn_practice::initialization::error_handling::debug(test_errcode);
+            exit(EXIT_SUCCESS);
+        },
         std::format("FATAL: Invalid errcode: {}", UINT32_MAX)
     );
 }
