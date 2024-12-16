@@ -1,6 +1,6 @@
 #include <cstdarg>
 
-#ifdef NDEBUG
+#ifndef NDEBUG
 #include <stdio.h>
 #endif
 
@@ -15,12 +15,12 @@ namespace cnn_practice {
     namespace initialization {
         namespace error_handling {
 
-            #ifdef NDEBUG
-            const char* variadic_print_prefix = "Variadic arg: {}\n";
-            void print_variadic_arg_list(const char* prefix, ...){
+            #ifndef NDEBUG
+            const std::string variadic_print_prefix = "Variadic arg: %A\n";
+            void print_variadic_arg_list(std::string prefix, ...){
                 va_list args;
                 va_start(args, prefix);
-                vprintf(prefix, args);
+                vprintf(prefix.c_str(), args);
                 va_end(args);
                 return;
             }
@@ -72,13 +72,16 @@ namespace cnn_practice {
             //case the coder who wrote the beginnings of the case statement
             //has moved on to another part of the code before they finished.
             //
-            std::shared_ptr<std::string> generate_error_string(const unsigned int errcode, std::string log_type, ...){
-                std::string temp;
-                va_list args;
-                va_start(args, log_type);
 
-                #ifdef NDEBUG
-                    print_variadic_arg_list(variadic_print_prefix, args);
+            //DO NOT CALL va_start.
+            std::shared_ptr<std::string> generate_error_string(
+                const unsigned int errcode,
+                std::string log_type,
+                va_list args
+            ){
+                std::string temp;
+                #ifndef NDEBUG
+                    print_variadic_arg_list("generate_error_string: " + variadic_print_prefix, args);
                 #endif 
                 
                 if(errcode > ERRCODE_MAX){
@@ -91,9 +94,6 @@ namespace cnn_practice {
                         break;
                     }
                     case INVALID_ERRCODE: {
-                        #ifdef NDEBUG
-                            print_variadic_arg_list(variadic_print_prefix, args);
-                        #endif
                         unsigned int input = va_arg(args, unsigned int);
                         temp = generate_string__invalid_errcode(input);
                         break;
@@ -125,7 +125,17 @@ namespace cnn_practice {
                 };
                 temp = std::format("{}: {}", log_type, temp);
                 return std::shared_ptr<std::string>(new std::string(temp));
-            }            
+            }
+
+            std::shared_ptr<std::string> generate_error_string(
+                const unsigned errcode,
+                std::string log_type,
+                ...
+            ){
+                va_list args;
+                va_start(args, log_type);
+                return generate_error_string(errcode, log_type, args);
+            }        
             
             void print_err(std::shared_ptr<std::string> message){
                 std::cerr << *message;
@@ -134,17 +144,25 @@ namespace cnn_practice {
             void fatal(const unsigned int errcode, ...) {
                 va_list args;
                 va_start(args, errcode);
+                #ifndef NDEBUG
+                    print_variadic_arg_list("fatal:  " + variadic_print_prefix, args);
+                #endif
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "FATAL", args);
                 if(msg == nullptr){
+                    //Problem.
                     msg = generate_error_string(INVALID_ERRCODE, "FATAL", errcode);
                 }
                 print_err(msg);
-                exit(EXIT_FAILURE);  
+                exit(EXIT_FAILURE);
+                va_end(args);
             }
 
             void warn(const unsigned int errcode, ...){
                 va_list args;
                 va_start(args, errcode);
+                #ifndef NDEBUG
+                    print_variadic_arg_list("warn:  " + variadic_print_prefix, args);
+                #endif
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "WARN", args);
                 if (msg == nullptr){
                     fatal(INVALID_ERRCODE, errcode);                
@@ -155,6 +173,9 @@ namespace cnn_practice {
             void debug(const unsigned int errcode, ...) {
                 va_list args;
                 va_start(args, errcode);
+                #ifndef NDEBUG
+                    print_variadic_arg_list("debug:  " + variadic_print_prefix, args);
+                #endif
                 std::shared_ptr<std::string> msg = generate_error_string(errcode, "DEBUG", args);
                 if (msg == nullptr){
                     fatal(INVALID_ERRCODE, errcode);                    
