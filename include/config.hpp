@@ -6,25 +6,28 @@
 #include <string>
 #include <vector>
 
-#include <opencv4/opencv2/opencv.hpp>
+#include <initialization/config/initiralization_config.hpp>
 
 namespace cnn_practice{
     namespace config {
         //Type definitions:
+        class Config
+
         class Config {
 
-            private:
-            static std::filesystem::path compute_image_directory_path(
-                std::filesystem::path> proj_curr_path
-            );
-
             public:
+            static std::shared_ptr<Config> parse_cli(
+                InitializationConfig config,
+                int argc,
+                char*[] argv
+            );
+            private:
+            //Config options needed in and inheritied from the initialization segment.
+            cnn_practice::initialization::InitializationConfig init_config;
 
-            static std::shared_ptr<Config> get_config();
-
-            private: 
             std::string image_directory_path;
-            bool display;
+            bool have_display;
+            bool disable_display;
 
             private:
             Config() = default;
@@ -33,12 +36,13 @@ namespace cnn_practice{
             Config(config& input);
             Config(Config&& input);
 
-            bool have_display();
             std::string get_image_directory_path();
-            std::vector<cv::Mat> get_unpacked_images();
-        };
+            bool get_have_display();
+            bool get_disable_display();
 
-        
+
+            std::string usage();
+        };        
     };
 };
 #endif

@@ -8,3 +8,125 @@ of the global config, are created independently of the global config
 and then added to it later.
 
 Work on the initializtion code.
+
+
+
+Initialization order:
+1. Logging.
+2. Error handling (depends: Logging).
+3. Config (depends: Error handling).
+
+
+
+Do I need to log to a file?
+
+
+Other than logging, what other configuration items do I need?
+-- Where to get the photos for training.
+-- Do we have a connected display?
+-- -- Perhaps some way to override display if we do?
+
+
+Do we need some way to easily add more configuration items as needed?
+--Right now? NO!
+
+Do we need a DeathHandler to facilitate graceful degradation?
+--Why do I need this?   Well, what happens when some function or other calls "fatal"?
+-- -- This should just be an indication that the CURRENT thread of execution cannot proceed
+      and should not outright kill the process.
+
+How to handle logging.
+--Should logging be in its own thread?
+-- -- If so, we need a message queue.
+-- -- -- We can handle that by creating a LogHandle object that acts as a front
+         for the logging subsystem. 
+         -- -- Keep it stupid simple: Let the message queue just be a ring buffer.
+         -- -- -- If there is no room in the buffer, then
+         -- -- -- -- If the message is non-critical, just drop it.
+         -- -- -- -- If the message IS critical, then replace a non-critical message in the buffer with it.
+         ---------------After, notify thei
+
+
+
+
+//Holds state:
+
+class Task {
+   virtual void rewindByStep(int n_steps);
+   virtual void runStep();
+   virtual void cleanUp();
+   virtual void finished();
+   virtual void bail_out();  //Used for recoverable errors;
+}
+class TaskRunnerHandle {
+    virtual void commitState();
+    virtual void requestRewind();
+}
+
+class TaskRunner {
+    public:
+    virtual void start() { throw exceptions::NotImplementedException(); }
+    virtual void kill() { throw exceptions::NotImplementedException(); }
+    virtual void requestRewind() {}
+}
+
+class SingleThreadTaskRunner : TaskRunner {
+    overload void start();
+    overload void kill();
+}
+
+class AsyncTaskExecutor {
+   protected:
+   virtual void start();
+   virtual void pause();
+   virtual void kill();
+}
+
+class AsyncTaskRunner : TaskRunner {
+    public:
+    overload void start();
+    overload void kill();
+    overload void requestRewind();
+}
+
+class LimitedTaskControllerHandle {
+    void kill_task();
+    void k
+};
+
+class TaskController {
+   TaskController(config::Config config);
+   register_task(Task *task);
+   void execute_tasks();
+   void request_death();
+}
+
+The Logger has the authority to demand process death.
+
+
+How to handle Task dependencies?
+----IDs? Cool, but then we have to register the tasks first.
+----Names? possibly. 
+
+
+Tasks sometimes need to register new tasks themselves.
+
+
+What is the object (class) I will use to kick off CNN training
+and usage?
+
+A task?  To KICK IT OFF? Hmm. I could.
+--Or, I could have a dedicated function to divy up the 
+
+Can a task just end on its own? Sure. let's let it unregister itself.
+That makes a lot of sense. So, in that case, the code that sets
+up training and registers the training tasks is itself another task.
+
+When a task declares itself to be finished, the task runner, if
+it has no other tasks to run, itself exits.
+
+Ok.  Then, while they should obviously not be given the full controller,
+should Tasks be given a handle to the controller with a limited method set?
+
+Finally, there will be times that tasks need to be passed parameters such
+as memory addresses.
