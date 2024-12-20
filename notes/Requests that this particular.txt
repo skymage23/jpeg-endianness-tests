@@ -1,0 +1,82 @@
+//Requests that this particular task be allowed to execute
+//in its entirety before any other tasks.
+//This request is only granted if it has a higher priority
+//than tasks already scheduled. Else, it must wait
+//until all currently executing tasks have completed.
+
+//These tasks are stored in a :w
+stack, separate from the others.
+const unsigned int REQUEST_RUN_UNTIL_COMPLETION = 0x1;
+
+struct TaskInfo {
+    //Hello:
+    TaskID task_id;
+    Priority task_priority
+    unsigned int flags;
+};
+
+//Intended to run on a single thread only.
+TaskScheduler {
+    private:
+    std::vector<TaskInfo*> tasks;
+
+    private:
+    void schedule();
+
+    public:
+    void add_task(TaskInfo task_info);
+    TaskID get_next_task();
+}
+
+
+
+How to allow tasks to have dependencies and parentage?
+
+Hmm. Parentage can be handled with vectors.
+     Parents should be able to request the deaths of their child tasks.
+     That means the TaskController needs to keep track of parentage.
+     We can delegate that task entirely to the TaskController.
+     --For parentage trees, we can use a hashtable with keys
+    mapped to vectors of child TaskIDs.
+    
+    When the parent dies, it needs to cascade that to the child tasks.
+    How will parents communicate with children? Or, do they need to?
+    What if a child tasks needs to return data to its parent?
+    What about suspending execution of the parent until its input data
+    (received from some source) is ready?
+    
+    
+    What if a child task needs to continuously supply its parent with input data?
+    --That's not much of a concern for me.  However, we do need a mechanism
+    to inform parent tasks about fatal errors in the child tasks.
+    --Errors can be included in data sent by children back to the parent.
+    
+    
+    
+    When we register a task, if it has dependencies, we pass that in as a parameter.
+    Ok. But then, how do we label the tasks so that we can set the dependencies.
+    
+    Do we separate the ID generation function? Regardless of whether or not we do,
+    how do we guarantee uniqueness.  Easy, we just keep track of the currently available ID,
+    assigning each ID sequentially and incrementing the aforementioned value.  Task IDs
+    only need to be unique during each session. We can wrap the "currently available ID"
+    behind a mutex.
+    
+    Do we need multiple schedulers, one for the TaskController, and ...
+    No. We can have a root task runner that houses the main scheduler.
+    -- We do need multiple schedulers, one for each TaskRunner.
+    --If we have multiple schedulers, how do we handle task tracking and management?
+    
+    Need multiple scheduler types? No. We just need one. We won't be using interrupts
+    to pause task execution. No need. We're not a real-time system.
+    
+    Yeah. I should make a separate Git repo for this.
+    
+    How do we track tasks? Answer that first. All tasks? Do we need to?
+    
+    
+    Each TaskRunner does have it's own scheduler, and the way that is handled is the Runner,
+    when it is instantiated, is told what type of scheduler to use. Then, it is given it's
+    set of tasks to run. New tasks may be added later, but there must always be at least one
+    task given to it at instantiation so that it has something to run when its "start" method
+    is invoked.

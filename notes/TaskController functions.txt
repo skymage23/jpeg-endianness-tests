@@ -1,0 +1,48 @@
+TaskController functions:
+Generate session-unique task IDs.
+register tasks for running on the thread pool.
+Track all tasks and their respective progress.
+--The UI renderer should be apprised of task progress.
+Has the ability to launch Tasks (in the main task runner or in ancillary worker runners).
+
+
+
+TaskRunner functions:
+Handle communications with the TaskController.
+House the task scheduler.
+
+
+
+Types of communications needed:
+Just mutex-protected ring buffers.
+
+
+Tasks:
+//vector<TaskContext*>  context_stack;
+TaskContext*  current_context;
+
+run:
+bail_out() //cleans up and calls "Logger.fatal()".
+
+
+For that TaskContext objects, is there any way we can only changes to values?
+
+
+TaskContext:
+These will probably need to be handled with void pointers (maybe).
+--Let's keep things simple and manageable.  Let the TaskContext objects
+  hold and version data of the largest word size used by the system (for us, 64-bit).
+  
+  For anything that should not be versioned (because there is no point), ....
+  
+  We don't have to copy the whole matrix in each versioned copy. Only what
+  elements changed.  For this, only a number of values equal to the matrix's
+  dimensionality + 1 is needed.
+
+
+
+Do I REALLY need this versioning system right now? Can't I make do with it using heap values?
+And, if I do need to reparameterize
+--No. I don't need the versioning system.  I can just ignore botched calculations for now.
+
+So, we don't need a TaskContext object system right now.

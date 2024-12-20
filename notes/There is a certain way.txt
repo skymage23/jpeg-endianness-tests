@@ -1,0 +1,34 @@
+There is a certain way we need to apply mutex locks to prevent threads from overwriting data written by other threads.
+Or, we can attempt to do a lookahead at any other index caches to see if other threads are accessing the same element.
+This means that the mutex needs to be activated only at the last step, the actual "read" or "write" step.
+
+
+We work under the assumption that if the tensor is accessed once by a thread, it is highly likely to be
+accessed repeatedly by that same thread. In that case, instead of frequently allocating and deallocating
+the index cache, we just "blank" it out and keep it around.
+
+If we are going to do crap that is thread local, though, would it not be better to work through a handler class?
+
+MOST ALGEBRA CALCULATIONS ON A TENSOR, IF THEY DO NOT RETURN A SCALAR VALUE, THEY RETURN A SEPARATE TENSOR.
+This means we do NOT have to worry about algebraic results sharing memory with their "parent"
+tensors.
+
+We wait until the last possible second to grab the mutex.
+We only need to grab the mutex if two or more threads are attempting to access the same element,
+   reading it or writing to it.
+
+std::shared_ptr
+
+
+How do I prevent one thread from writing to the index of another thread erroneously.
+Other threads should only have authority to destroy index caches that have not
+been accessed by their associated threads recently.
+
+Answer: Since the threads do not have direct access to the cache map, there is very little
+        risk of them accessing caches they do not own, and if they do, that is a situation
+        that cannot be reasonably accounted for as it implies a programming error or unknown
+        out-of-process access.
+        
+        
+        
+Work on exception-handling code.

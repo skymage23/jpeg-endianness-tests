@@ -56,7 +56,8 @@ class Task {
    virtual void runStep();
    virtual void cleanUp();
    virtual void finished();
-   virtual void bail_out();  //Used for recoverable errors;
+   virtual void bail_out(Errcode errcode);  //Used for unrecoverable errors; Performs cleanup
+                                            //before calling Logger.fatal(errcode);
 }
 class TaskRunnerHandle {
     virtual void commitState();

@@ -1,0 +1,19 @@
+I expect that most of the images uploaded to my site will be taken via cell phone.
+I should normalize my images to the size and resolution of the average cell phone camera.
+I'm going to need to Google.
+Strategy:
+
+What is the most common cell phone in current usage?
+Second most common?
+Third most common?
+Fourth most common?
+What are the resolutions of their back cameras?
+Take those numbers and calculate an estimated average cell phone back camera resolution.
+-- Most likely you will have to round up the nearest power of 2.
+
+
+
+
+https://arxiv.org/abs/1511.07122
+
+

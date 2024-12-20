@@ -1,0 +1,79 @@
+Type of schedulers:
+
+The virtual base class Scheduler.
+
+RoundRobinScheduler:
+//ignores priority and invokes the "run" method of
+//each of its tasks in any arbitrary order, but
+//with the guarantee that the "run" method of
+//each task is ran once before running
+//the same method more than twice for any given task.
+
+Still need to solve the problem of the initial, root scheduler.
+--Some sort of "TotalityScheduler" that gives all of its runtime to
+  a single task? 
+  
+  Let's get one thing out of the way:
+  UI will be in it's own thread, or at least in it's own Task.
+  
+  Tasks can set up other tasks and set themselves up as the parent.
+  They can set up dependencies for these other tasks.
+  Tasks that are strictly independent of one another are automatically
+  ran in parallel if the number of allotted threads allows for it.
+  
+  
+  By default, the maximum thread limit should be equal to the number of processor cores on the host machine.
+  
+  
+  We can have "main" set up the initial Task runner.
+  
+  The UI thread itself can be handles as a Task.
+  
+  So then.  Main sets up the TaskController, the parent task, and then
+  calls "TaskController.start()"?
+  
+  This root task then sets up the other tasks before 
+  
+  The TaskRunners contain the loops.
+  
+  Great. Now, how will the Logger talk to the TaskController?
+  And, how will the TaskController talk to the TaskRunners?
+  
+  Mutex-protected ring buffers.
+  Or, we can create some one-way messaging systems so that mutexes aren't needed.
+  
+  Most of the time, communications with the TaskController will be broadcast
+  comms and one-way. So, we can have a OneWayBroadcastMailman that doesn't use
+  mutex locks.
+  
+  
+  
+  ProviderSubscriberMailman:
+  PipeMailman:
+  Tasks can request to "go to sleep" (i.e. Request to not have it's "run" method called. ) until
+  it is signaled (receives a message bound for it).
+  
+  "Mailmen" send "Letters":
+  Letters
+  
+  
+  TaskResult object needed?
+  
+  Sure. In that case, we call a specific method on the TaskRunner that tells it to organize
+  the return of a pointer to the TaskResult to the parent task. The TaskController
+  merely manages the underlying thread.
+  
+  TaskResult:
+  Template, with the parameter being the type of the datum passed back to the Task.
+  This value is passed
+  
+  Remember: The TaskRunner is a layer between the Tasks and the TaskController.
+  It is the responsibility of the TaskRunners to handle communications between parent and child.
+  --These TaskRunners communicate with each other on behalf of their Tasks.
+  
+The Taskrunners then populate the "mailboxes" of the Tasks in question and it is the responsibility
+of the Tasks themselves to actually check it.
+
+The TaskRunner always checks for inbound messages prior to running any Tasks at the beginning
+of each loop.  Outbound messages are sent at the end of the loop body prior to looping back.
+

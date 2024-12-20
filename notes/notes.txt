@@ -1,0 +1,1 @@
+I'm going to need to craft my own convolutional neural network (CNN).

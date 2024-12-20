@@ -1,0 +1,6 @@
+What can go wrong during config parsing, assuming the file exists?
+1. File is not readable.
+2. arch is not a supported value.
+3. auth_type is not a supported value.
+4. cred_file does not exist.
+5. cred_file does not contain valid key-value pairs for username and password.
